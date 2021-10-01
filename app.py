@@ -61,8 +61,7 @@ def sift_read():
         if read_result.status.lower () not in ['notstarted', 'running']:
            waitingOnAPI = False
            break
-        print ('Waiting for result...')
-        time.sleep(10)
+        time.sleep(2)
 
     if read_result.status == OperationStatusCodes.succeeded:
         textResults.append("Analysis Results:")
@@ -70,7 +69,7 @@ def sift_read():
             for line in text_result.lines:
                 textResults.append(line.text)
                 
-    if len(textResults) < 2:
+    if len(textResults) < 1:
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
@@ -121,7 +120,7 @@ def sift_ocr():
         lines_words.append(w)
 
     textResults = lines_words
-    if len(textResults) < 3:
+    if len(textResults) < 1:
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
