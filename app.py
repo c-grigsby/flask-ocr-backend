@@ -61,7 +61,7 @@ def sift_read():
         if read_result.status.lower () not in ['notstarted', 'running']:
            waitingOnAPI = False
            break
-        time.sleep(2)
+        time.sleep(1)
 
     if read_result.status == OperationStatusCodes.succeeded:
         textResults.append("Analysis Results:")
