@@ -3,12 +3,17 @@ from azure.cognitiveservices.vision.computervision.models import OperationStatus
 from msrest.authentication import CognitiveServicesCredentials
 from flask import Flask, request, Response, render_template
 from dotenv import load_dotenv
+from google.cloud import vision     
 import json
 import time
 import cv2
 import os
 import os.path
 import requests
+import os, io
+import requests
+import io 
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -110,6 +115,8 @@ def sift_ocr():
     response.raise_for_status()
     analysis = response.json()
 
+    textResults = []
+    textResults.append("Analysis Results:")
     regions = analysis["regions"]
     lines = [region["lines"] for region in regions][0]
     words = [line["words"] for line in lines]
@@ -120,11 +127,52 @@ def sift_ocr():
         lines_words.append(w)
 
     textResults = lines_words
-    if len(textResults) < 1:
+    if len(textResults) < 2:
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
 
+    return Response(response=analysis_res, status=200, mimetype="application/json")
+
+  return render_template('layout.html',upload=False)
+
+@app.route('/sift-vision-ocr', methods=["POST", "GET"])
+def sift_vision_ocr():
+  if request.method == "POST":
+    image_file = request.files['image']
+    filename = image_file.filename
+    path_save = os.path.join(UPLOAD_PATH, filename)
+    image_file.save(path_save)
+
+    image_to_ocr = cv2.imread(path_save)
+    # preprocess Step1: Convert to Gray
+    preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+    # preprocess Step2: Binary and Otsu Thresholding 
+    _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    # preprocess Step3: Median Blur to rm noise in img
+    preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
+    # save the preprocessed image
+    cv2.imwrite(path_save, preprocessed_img)
+
+    # Call Google Vision API
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ServiceToken.json'
+    client = vision.ImageAnnotatorClient()    
+    with io.open(path_save, 'rb') as image_file:        
+    	content = image_file.read()    
+    image = vision.Image(content=content)    
+    
+    response = client.text_detection(image=image)    
+    texts = response.text_annotations   
+    
+    # Get Results
+    textResults = []  
+    for text in texts:        
+        textResults.append(text.description)  
+
+    # Remove line text to individual words for analysis results
+    textResults.pop(0)
+
+    analysis_res = json.dumps(textResults)
     return Response(response=analysis_res, status=200, mimetype="application/json")
 
   return render_template('layout.html',upload=False)
