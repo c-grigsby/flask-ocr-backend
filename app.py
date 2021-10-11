@@ -64,7 +64,6 @@ def sift_read():
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY")
     endpoint = os.getenv("AZURE_ENDPOINT")
     computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
-    print("===== Read API - Local File =====")
     read_image_path = os.path.join(UPLOAD_PATH, filename)         
     read_image = open(read_image_path, "rb")
 
@@ -140,7 +139,6 @@ def sift_ocr():
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY_2")
     vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
     ocr_url = vision_base_url + "ocr"
-    print("===== OCR API - Local File =====")
 
     read_image_path = os.path.join(UPLOAD_PATH, filename)         
     image_data = open(read_image_path, "rb").read()
@@ -212,7 +210,6 @@ def sift_vision():
       cv2.imwrite(path_save, preprocessed_img)
 
     # Call Google Vision API
-    print("===== Google Vision API - Local File =====")
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ServiceToken.json'
     client = vision.ImageAnnotatorClient()    
     with io.open(path_save, 'rb') as image_file:        
