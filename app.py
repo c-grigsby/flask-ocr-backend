@@ -14,7 +14,6 @@ import os, io
 import requests
 import io 
 
-
 load_dotenv()
 app = Flask(__name__)
 
@@ -29,19 +28,37 @@ def home():
 def sift_read():
   if request.method == "POST":
     image_file = request.files['image']
+    preprocessing_level = int(request.form['preprocessing'])
     filename = image_file.filename
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
 
-    image_to_ocr = cv2.imread(path_save)
-    # preprocess Step1: Convert to Gray
-    preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-    # preprocess Step2: Binary and Otsu Thresholding 
-    _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    # preprocess Step3: Median Blur to rm noise in img
-    preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
-    # save the preprocessed image
-    cv2.imwrite(path_save, preprocessed_img)
+    if (preprocessing_level == 1):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
+
+    elif (preprocessing_level == 2):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # preprocess Step2: Binary and Otsu Thresholding 
+      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
+
+    elif (preprocessing_level == 3):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # preprocess Step2: Binary and Otsu Thresholding 
+      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+      # preprocess Step3: Median Blur to rm noise in img
+      preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
 
     # Send img to Azure Read API
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY")
@@ -51,7 +68,7 @@ def sift_read():
     read_image_path = os.path.join(UPLOAD_PATH, filename)         
     read_image = open(read_image_path, "rb")
 
-    # Call API with image and raw response to get OperationID
+    # Call API with img and raw response to get OperationID
     read_response = computervision_client.read_in_stream(read_image, raw=True)
     # Get the operation location (URL with ID as last appendage)
     read_operation_location = read_response.headers["Operation-Location"]
@@ -60,7 +77,7 @@ def sift_read():
 
     textResults = []
     waitingOnAPI = True
-    # 'GET' API results
+    # 'GET' results
     while waitingOnAPI:
         read_result = computervision_client.get_read_result(operation_id)
         if read_result.status.lower () not in ['notstarted', 'running']:
@@ -69,12 +86,13 @@ def sift_read():
         time.sleep(1)
 
     if read_result.status == OperationStatusCodes.succeeded:
-        textResults.append("Analysis Results:")
+        result_str = "Analysis Results: Preprocessing Level " + str(preprocessing_level)
+        textResults.append(result_str)
         for text_result in read_result.analyze_result.read_results:
             for line in text_result.lines:
                 textResults.append(line.text)
                 
-    if len(textResults) < 1:
+    if len(textResults) < 2:
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
@@ -87,20 +105,38 @@ def sift_read():
 def sift_ocr():
   if request.method == "POST":
     image_file = request.files['image']
+    preprocessing_level = int(request.form['preprocessing'])
     filename = image_file.filename
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
 
-    image_to_ocr = cv2.imread(path_save)
-    # preprocess Step1: Convert to Gray
-    preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-    # preprocess Step2: Binary and Otsu Thresholding 
-    _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    # preprocess Step3: Median Blur to rm noise in img
-    preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
-    # save the preprocessed image
-    cv2.imwrite(path_save, preprocessed_img)
+    if (preprocessing_level == 1):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
 
+    elif (preprocessing_level == 2):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # preprocess Step2: Binary and Otsu Thresholding 
+      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
+
+    elif (preprocessing_level == 3):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # preprocess Step2: Binary and Otsu Thresholding 
+      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+      # preprocess Step3: Median Blur to rm noise in img
+      preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
+    
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY_2")
     vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
     ocr_url = vision_base_url + "ocr"
@@ -116,7 +152,7 @@ def sift_ocr():
     analysis = response.json()
 
     textResults = []
-    textResults.append("Analysis Results:")
+
     regions = analysis["regions"]
     lines = [region["lines"] for region in regions][0]
     words = [line["words"] for line in lines]
@@ -127,7 +163,10 @@ def sift_ocr():
         lines_words.append(w)
 
     textResults = lines_words
-    if len(textResults) < 2:
+    result_str = ["Analysis Results: Preprocessing Level " + str(preprocessing_level)]
+    textResults.insert(0,result_str)
+
+    if len(textResults) <= 1:
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
@@ -136,25 +175,44 @@ def sift_ocr():
 
   return render_template('layout.html',upload=False)
 
-@app.route('/sift-vision-ocr', methods=["POST", "GET"])
-def sift_vision_ocr():
+@app.route('/sift-vision', methods=["POST", "GET"])
+def sift_vision():
   if request.method == "POST":
     image_file = request.files['image']
+    preprocessing_level = int(request.form['preprocessing'])
     filename = image_file.filename
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
 
-    image_to_ocr = cv2.imread(path_save)
-    # preprocess Step1: Convert to Gray
-    preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-    # preprocess Step2: Binary and Otsu Thresholding 
-    _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    # preprocess Step3: Median Blur to rm noise in img
-    preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
-    # save the preprocessed image
-    cv2.imwrite(path_save, preprocessed_img)
+    if (preprocessing_level == 1):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
+
+    elif (preprocessing_level == 2):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # preprocess Step2: Binary and Otsu Thresholding 
+      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
+
+    elif (preprocessing_level == 3):
+      image_to_ocr = cv2.imread(path_save)
+      # preprocess Step1: Convert to Gray
+      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
+      # preprocess Step2: Binary and Otsu Thresholding 
+      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+      # preprocess Step3: Median Blur to rm noise in img
+      preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
+      # save the preprocessed image
+      cv2.imwrite(path_save, preprocessed_img)
 
     # Call Google Vision API
+    print("===== Google Vision API - Local File =====")
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ServiceToken.json'
     client = vision.ImageAnnotatorClient()    
     with io.open(path_save, 'rb') as image_file:        
@@ -164,13 +222,18 @@ def sift_vision_ocr():
     response = client.text_detection(image=image)    
     texts = response.text_annotations   
     
-    # Get Results
-    textResults = []  
+    # Process results
+    textResults = [] 
+    result_str = "Analysis Results: Preprocessing Level " + str(preprocessing_level)
+    textResults.append(result_str)
+
     for text in texts:        
         textResults.append(text.description)  
+    # Remove lines of text
+    textResults.pop(1)
 
-    # Remove line text to individual words for analysis results
-    textResults.pop(0)
+    if len(textResults) <= 1:
+      textResults.append("No text was discovered")
 
     analysis_res = json.dumps(textResults)
     return Response(response=analysis_res, status=200, mimetype="application/json")
@@ -178,4 +241,4 @@ def sift_vision_ocr():
   return render_template('layout.html',upload=False)
 
 if __name__ == "__main__":
-        app.run()
+        app.run(debug=True)
