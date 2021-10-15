@@ -1,13 +1,7 @@
 <div align="center" markdown="1">
 
-<<<<<<< HEAD
 <img src="https://www.probytes.net/wp-content/uploads/2018/10/flask-logo-png-transparent.png" height="160" alt="FlaskApp">
 <br/>
-=======
-<img src="https://www.probytes.net/wp-content/uploads/2018/10/flask-logo-png-transparent.png" height="140" alt="FlaskApp">
-<br/><br/>
-
-> > > > > > > develop
 
 # Flask OCR Back-end
 
