@@ -60,6 +60,26 @@ def sift_read():
       # save the preprocessed image
       cv2.imwrite(path_save, preprocessed_img)
 
+    elif (preprocessing_level == 4):
+      img = cv2.imread(path_save)
+      # preprocess Step4: Crop Image - get bounding box
+      gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    
+      dst = cv2.Canny(gray, 0, 150)
+      blured = cv2.blur(dst, (5,5), 0) 
+      # estimate min contour by size of the contour area   
+      MIN_CONTOUR_AREA=50000
+      img_thresh = cv2.adaptiveThreshold(blured, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+      Contours,imgContours = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+      for contour in Contours:
+        if cv2.contourArea(contour) > MIN_CONTOUR_AREA:
+          [X, Y, W, H] = cv2.boundingRect(contour)
+          box=cv2.rectangle(img, (X, Y), (X + W, Y + H), (0,0,255), 2)
+      # Crop Image
+      cropped_image = img[Y:Y+H, X:X+W]
+      # save the preprocessed image
+      cv2.imwrite(path_save, cropped_image) 
+
     # Send img to Azure Read API
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY")
     endpoint = os.getenv("AZURE_ENDPOINT")
@@ -136,6 +156,26 @@ def sift_ocr():
       # save the preprocessed image
       cv2.imwrite(path_save, preprocessed_img)
     
+    elif (preprocessing_level == 4):
+      img = cv2.imread(path_save)
+      # preprocess Step4: Crop Image - get bounding box
+      gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    
+      dst = cv2.Canny(gray, 0, 150)
+      blured = cv2.blur(dst, (5,5), 0)
+      # estimate min contour by size of the image   
+      MIN_CONTOUR_AREA=40000
+      img_thresh = cv2.adaptiveThreshold(blured, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+      Contours,imgContours = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+      for contour in Contours:
+        if cv2.contourArea(contour) > MIN_CONTOUR_AREA:
+          [X, Y, W, H] = cv2.boundingRect(contour)
+          box=cv2.rectangle(img, (X, Y), (X + W, Y + H), (0,0,255), 2)
+      # Crop Image
+      cropped_image = img[Y:Y+H, X:X+W]
+      # save the preprocessed image
+      cv2.imwrite(path_save, cropped_image) 
+    
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY_2")
     vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
     ocr_url = vision_base_url + "ocr"
@@ -208,6 +248,26 @@ def sift_vision():
       preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
       # save the preprocessed image
       cv2.imwrite(path_save, preprocessed_img)
+    
+    elif (preprocessing_level == 4):
+      img = cv2.imread(path_save)
+      # preprocess Step4: Crop Image - get bounding box
+      gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    
+      dst = cv2.Canny(gray, 0, 150)
+      blured = cv2.blur(dst, (5,5), 0) 
+      # estimate min contour by size of the image    
+      MIN_CONTOUR_AREA=40000
+      img_thresh = cv2.adaptiveThreshold(blured, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+      Contours,imgContours = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+      for contour in Contours:
+        if cv2.contourArea(contour) > MIN_CONTOUR_AREA:
+          [X, Y, W, H] = cv2.boundingRect(contour)
+          box=cv2.rectangle(img, (X, Y), (X + W, Y + H), (0,0,255), 2)
+      # Crop Image
+      cropped_image = img[Y:Y+H, X:X+W]
+      # save the preprocessed image
+      cv2.imwrite(path_save, cropped_image) 
 
     # Call Google Vision API
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ServiceToken.json'
