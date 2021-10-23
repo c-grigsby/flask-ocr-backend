@@ -16,6 +16,7 @@ This server-side application is the back-end to a mobile application providing O
 - Developed in Python with Flask micro-framework
 - Image preprocessing via OpenCV
 - Utilizes Azure Computer Vision and Google Vision APIs
+- Image files via requests are stored locally
 - Deployed to [Heroku](https://www.heroku.com/)
 
 ---
@@ -23,6 +24,53 @@ This server-side application is the back-end to a mobile application providing O
 ## Deployed URL for API services
 
 - https://computer-vision-api.herokuapp.com/{endpoint}
+
+---
+
+## API References
+
+- POST: https://computer-vision-api.herokuapp.com/sift-read
+
+  - OCR Analysis via Azure Read v3.0 API
+
+- POST: https://computer-vision-api.herokuapp.com/sift-ocr
+
+  - OCR Analysis via Azure OCR v2.1 API
+
+- POST: https://computer-vision-api.herokuapp.com/sift-vision
+  - OCR Analysis via Google Vision API
+
+#### Request body:
+
+- image: _the image file_
+- preprocessing: _a number from 0 - 4 representing the desired preprocessing level_
+
+---
+
+## Getting Started
+
+- Ensure Python is installed locally on your machine
+- To initialize a virtual enviroment, navigate to the directory of the application in the terminal and execute:
+
+  ##### _Note: "python3" will depend on your version of Python_
+
+  ```
+  $ python3 -m venv venv
+  ```
+
+- Activate the virtual environment:
+
+  ```
+  $ source venv/bin/activate
+  ```
+
+- Install dependencies:
+
+  ```
+  $ pip install -r requirements.txt
+  ```
+
+---
 
 #### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
