@@ -33,52 +33,7 @@ def sift_read():
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
 
-    if (preprocessing_level == 1):
-      image_to_ocr = cv2.imread(path_save)
-      # preprocess Step1: Convert to Gray
-      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-      # save the preprocessed image
-      cv2.imwrite(path_save, preprocessed_img)
-
-    elif (preprocessing_level == 2):
-      image_to_ocr = cv2.imread(path_save)
-      # preprocess Step1: Convert to Gray
-      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-      # preprocess Step2: Binary and Otsu Thresholding 
-      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-      # save the preprocessed image
-      cv2.imwrite(path_save, preprocessed_img)
-
-    elif (preprocessing_level == 3):
-      image_to_ocr = cv2.imread(path_save)
-      # preprocess Step1: Convert to Gray
-      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-      # preprocess Step2: Binary and Otsu Thresholding 
-      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-      # preprocess Step3: Median Blur to rm noise in img
-      preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
-      # save the preprocessed image
-      cv2.imwrite(path_save, preprocessed_img)
-
-    elif (preprocessing_level == 4):
-      img = cv2.imread(path_save)
-      # preprocess Step4: Crop Image - get bounding box
-      gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    
-      dst = cv2.Canny(gray, 0, 150)
-      blured = cv2.blur(dst, (5,5), 0) 
-      # estimate min contour by size of the contour area   
-      MIN_CONTOUR_AREA=50000
-      img_thresh = cv2.adaptiveThreshold(blured, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
-      Contours,imgContours = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-      for contour in Contours:
-        if cv2.contourArea(contour) > MIN_CONTOUR_AREA:
-          [X, Y, W, H] = cv2.boundingRect(contour)
-          box=cv2.rectangle(img, (X, Y), (X + W, Y + H), (0,0,255), 2)
-      # Crop Image
-      cropped_image = img[Y:Y+H, X:X+W]
-      # save the preprocessed image
-      cv2.imwrite(path_save, cropped_image) 
+    img_preprocessing(preprocessing_level, path_save)
 
     # Send img to Azure Read API
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY")
@@ -115,7 +70,6 @@ def sift_read():
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
-
     return Response(response=analysis_res, status=200, mimetype="application/json")
 
   return render_template('layout.html',upload=False)
@@ -129,53 +83,9 @@ def sift_ocr():
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
 
-    if (preprocessing_level == 1):
-      image_to_ocr = cv2.imread(path_save)
-      # preprocess Step1: Convert to Gray
-      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-      # save the preprocessed image
-      cv2.imwrite(path_save, preprocessed_img)
-
-    elif (preprocessing_level == 2):
-      image_to_ocr = cv2.imread(path_save)
-      # preprocess Step1: Convert to Gray
-      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-      # preprocess Step2: Binary and Otsu Thresholding 
-      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-      # save the preprocessed image
-      cv2.imwrite(path_save, preprocessed_img)
-
-    elif (preprocessing_level == 3):
-      image_to_ocr = cv2.imread(path_save)
-      # preprocess Step1: Convert to Gray
-      preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
-      # preprocess Step2: Binary and Otsu Thresholding 
-      _, preprocessed_img = cv2.threshold(preprocessed_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-      # preprocess Step3: Median Blur to rm noise in img
-      preprocessed_img = cv2.medianBlur(preprocessed_img, 3)
-      # save the preprocessed image
-      cv2.imwrite(path_save, preprocessed_img)
+    img_preprocessing(preprocessing_level, path_save)
     
-    elif (preprocessing_level == 4):
-      img = cv2.imread(path_save)
-      # preprocess Step4: Crop Image - get bounding box
-      gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    
-      dst = cv2.Canny(gray, 0, 150)
-      blured = cv2.blur(dst, (5,5), 0)
-      # estimate min contour by size of the image   
-      MIN_CONTOUR_AREA=40000
-      img_thresh = cv2.adaptiveThreshold(blured, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
-      Contours,imgContours = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-      for contour in Contours:
-        if cv2.contourArea(contour) > MIN_CONTOUR_AREA:
-          [X, Y, W, H] = cv2.boundingRect(contour)
-          box=cv2.rectangle(img, (X, Y), (X + W, Y + H), (0,0,255), 2)
-      # Crop Image
-      cropped_image = img[Y:Y+H, X:X+W]
-      # save the preprocessed image
-      cv2.imwrite(path_save, cropped_image) 
-    
+    # Send image to Azure OCR API
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY_2")
     vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
     ocr_url = vision_base_url + "ocr"
@@ -190,7 +100,6 @@ def sift_ocr():
     analysis = response.json()
 
     textResults = []
-
     regions = analysis["regions"]
     lines = [region["lines"] for region in regions][0]
     words = [line["words"] for line in lines]
@@ -208,7 +117,6 @@ def sift_ocr():
       textResults.append("No text was discovered")
     
     analysis_res = json.dumps(textResults)
-
     return Response(response=analysis_res, status=200, mimetype="application/json")
 
   return render_template('layout.html',upload=False)
@@ -222,14 +130,49 @@ def sift_vision():
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
 
-    if (preprocessing_level == 1):
+    img_preprocessing(preprocessing_level, path_save)
+
+    # Call Google Vision API
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ServiceToken.json'
+    client = vision.ImageAnnotatorClient()    
+    with io.open(path_save, 'rb') as image_file:        
+    	content = image_file.read()    
+    image = vision.Image(content=content)    
+    
+    response = client.text_detection(image=image)    
+    texts = response.text_annotations
+
+    # Process results
+    textResults = [] 
+    result_str = "Analysis Results: Preprocessing Level " + str(preprocessing_level)
+    textResults.append(result_str)
+
+    for text in texts:        
+        textResults.append(text.description)  
+    # Remove lines of text
+    textResults.pop(1)
+
+    if len(textResults) <= 1:
+      textResults.append("No text was discovered")
+
+    analysis_res = json.dumps(textResults)
+    return Response(response=analysis_res, status=200, mimetype="application/json")
+
+  return render_template('layout.html',upload=False)
+
+def img_preprocessing(preprocessing_level, path_save):
+
+  if (preprocessing_level == 0): 
+    return
+    
+  if (preprocessing_level == 1):
       image_to_ocr = cv2.imread(path_save)
       # preprocess Step1: Convert to Gray
       preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
       # save the preprocessed image
       cv2.imwrite(path_save, preprocessed_img)
 
-    elif (preprocessing_level == 2):
+  elif (preprocessing_level == 2):
       image_to_ocr = cv2.imread(path_save)
       # preprocess Step1: Convert to Gray
       preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
@@ -238,7 +181,7 @@ def sift_vision():
       # save the preprocessed image
       cv2.imwrite(path_save, preprocessed_img)
 
-    elif (preprocessing_level == 3):
+  elif (preprocessing_level == 3):
       image_to_ocr = cv2.imread(path_save)
       # preprocess Step1: Convert to Gray
       preprocessed_img = cv2.cvtColor(image_to_ocr, cv2.COLOR_BGR2GRAY)
@@ -249,7 +192,7 @@ def sift_vision():
       # save the preprocessed image
       cv2.imwrite(path_save, preprocessed_img)
     
-    elif (preprocessing_level == 4):
+  elif (preprocessing_level == 4):
       img = cv2.imread(path_save)
       # preprocess Step4: Crop Image - get bounding box
       gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    
@@ -268,34 +211,6 @@ def sift_vision():
       cropped_image = img[Y:Y+H, X:X+W]
       # save the preprocessed image
       cv2.imwrite(path_save, cropped_image) 
-
-    # Call Google Vision API
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'ServiceToken.json'
-    client = vision.ImageAnnotatorClient()    
-    with io.open(path_save, 'rb') as image_file:        
-    	content = image_file.read()    
-    image = vision.Image(content=content)    
-    
-    response = client.text_detection(image=image)    
-    texts = response.text_annotations   
-    
-    # Process results
-    textResults = [] 
-    result_str = "Analysis Results: Preprocessing Level " + str(preprocessing_level)
-    textResults.append(result_str)
-
-    for text in texts:        
-        textResults.append(text.description)  
-    # Remove lines of text
-    textResults.pop(1)
-
-    if len(textResults) <= 1:
-      textResults.append("No text was discovered")
-
-    analysis_res = json.dumps(textResults)
-    return Response(response=analysis_res, status=200, mimetype="application/json")
-
-  return render_template('layout.html',upload=False)
 
 if __name__ == "__main__":
         app.run(debug=True)
