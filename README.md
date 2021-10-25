@@ -1,6 +1,7 @@
 <div align="center" markdown="1">
 
-<img src="https://www.probytes.net/wp-content/uploads/2018/10/flask-logo-png-transparent.png" height="160" alt="FlaskApp">
+<img src="https://www.educative.io/api/page/6196871006519296/image/download/6316021754363904" height="165" alt="FlaskApp">
+
 <br/>
 
 # Flask OCR Back-end
@@ -16,7 +17,7 @@ This server-side application is the back-end to a mobile application providing O
 - Developed in Python with Flask micro-framework
 - Image preprocessing via OpenCV
 - Utilizes Azure Computer Vision and Google Vision APIs
-- Image files via requests are stored locally
+- Image files via requests stored locally
 - Deployed to [Heroku](https://www.heroku.com/)
 
 ---
