@@ -30,21 +30,29 @@ This server-side application is the back-end to a mobile application providing O
 
 ## API References
 
-- POST: https://computer-vision-api.herokuapp.com/sift-read
+- URL: https://computer-vision-api.herokuapp.com/sift-read
 
-  - OCR Analysis via Azure Read v3.0 API
+  - Method: POST
+  - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
+  - Response: OCR Analysis via Azure Read v3.0 API
 
-- POST: https://computer-vision-api.herokuapp.com/sift-ocr
+- URL: https://computer-vision-api.herokuapp.com/sift-ocr
 
-  - OCR Analysis via Azure OCR v2.1 API
+  - Method: POST
+  - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
+  - Response: OCR Analysis via Azure OCR v2.1 API
 
-- POST: https://computer-vision-api.herokuapp.com/sift-vision
-  - OCR Analysis via Google Vision API
+- URL: https://computer-vision-api.herokuapp.com/sift-vision
 
-#### Request body:
+  - Method: POST
+  - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
+  - Response: OCR Analysis via Google Vision API
 
-- image: _the image file_
-- preprocessing: _a number from 0 - 4 representing the desired preprocessing level_
+- URL: https://computer-vision-api.herokuapp.com/sift-contour
+
+  - Method: POST
+  - Body: image: _the image file_
+  - Response: Successful if the contours of the largest bounding box discovered within the image is assessed to have been contained within the images width
 
 ---
 
