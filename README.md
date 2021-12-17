@@ -52,7 +52,7 @@ This server-side application is the back-end to a mobile application providing O
 
   - Method: POST
   - Body: image: _the image file_
-  - Response: Successful if the contours of the largest bounding box discovered within the image is assessed to have been contained within the images width
+  - Response: Successful if the contours of a largest bounding box are discovered to be contained within the images maximum width. Returns an image file auto-cropped to the region of interest.
 
 ---
 

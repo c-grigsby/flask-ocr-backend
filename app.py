@@ -11,8 +11,6 @@ import os
 import os.path
 import requests
 import os, io
-import requests
-import io 
 
 load_dotenv()
 app = Flask(__name__)
