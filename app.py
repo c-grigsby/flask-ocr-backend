@@ -57,7 +57,6 @@ def sift_read():
             # Extract ID for results
             operation_id = read_operation_location.split("/")[-1]
 
-            textResults = []
             waitingOnAPI = True
             # 'GET' results
             while waitingOnAPI:
@@ -69,9 +68,7 @@ def sift_read():
                 time.sleep(1)
 
             if read_result.status == OperationStatusCodes.succeeded:
-                result_str = "Analysis Results: Preprocessing Level " + \
-                    str(preprocessing_level)
-                textResults.append(result_str)
+
                 for text_result in read_result.analyze_result.read_results:
                     for line in text_result.lines:
                         textResults.append(line.text)
@@ -81,7 +78,7 @@ def sift_read():
                             textBoundingBox.append(line.bounding_box)
                             for pixel_nums in textBoundingBox[0]:
                                 boundingBoxNumbers.append(pixel_nums)
-                                # upper left point coordinate bounding box
+                            # upper left point coordinate bounding box
                             x1 = int(boundingBoxNumbers[0])
                             y1 = int(boundingBoxNumbers[1])
                             # upper right coordinate of bounding box
@@ -102,9 +99,41 @@ def sift_read():
                             cv2.imwrite(path_save, cropped_image1)
                             # find bounding box if present
                             img_preprocessing(4, path_save)
+
+                            # Send img to Azure Read API again
+                            subscription_key = os.getenv(
+                                "AZURE_SUBSCRIPTION_KEY")
+                            endpoint = os.getenv("AZURE_ENDPOINT")
+                            computervision_client = ComputerVisionClient(
+                                endpoint, CognitiveServicesCredentials(subscription_key))
+                            read_image_path = os.path.join(
+                                UPLOAD_PATH, filename)
+                            read_image = open(read_image_path, "rb")
+
+                            read_response = computervision_client.read_in_stream(
+                                read_image, raw=True)
+                            read_operation_location = read_response.headers["Operation-Location"]
+                            operation_id = read_operation_location.split(
+                                "/")[-1]
+
+                            waitingOnAPI = True
+                            # 'GET' results
+                            while waitingOnAPI:
+                                read_result = computervision_client.get_read_result(
+                                    operation_id)
+                                if read_result.status.lower() not in ['notstarted', 'running']:
+                                    waitingOnAPI = False
+                                    break
+                                time.sleep(1)
+
+                            if read_result.status == OperationStatusCodes.succeeded:
+                                textResults.clear()
+                                for text_result in read_result.analyze_result.read_results:
+                                    for line in text_result.lines:
+                                        textResults.append(line.text)
                             break
 
-            if len(textResults) < 2:
+            if len(textResults) == 0:
                 textResults.append("No text was discovered")
 
             analysis_res = json.dumps(textResults)
