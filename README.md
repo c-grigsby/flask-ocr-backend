@@ -18,6 +18,7 @@ This server-side application is the back-end to a mobile application providing O
 - Image preprocessing via OpenCV
 - Utilizes Azure Computer Vision and Google Vision APIs
 - Image files via requests stored locally
+- Automated image crop to a region of interest via text recognition
 - Deployed to [Heroku](https://www.heroku.com/)
 
 ---
