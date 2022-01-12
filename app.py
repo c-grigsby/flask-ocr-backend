@@ -34,14 +34,13 @@ def sift_read():
             filename = image_file.filename
             path_save = os.path.join(UPLOAD_PATH, filename)
             image_file.save(path_save)
-
             textBoundingBox = []
             boundingBoxNumbers = []
             textResults = []
 
             img_preprocessing(preprocessing_level, path_save)
 
-            # Send img to Azure Read API
+            # Azure Read API Config
             subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY")
             endpoint = os.getenv("AZURE_ENDPOINT")
             computervision_client = ComputerVisionClient(
@@ -78,13 +77,13 @@ def sift_read():
                             textBoundingBox.append(line.bounding_box)
                             for pixel_nums in textBoundingBox[0]:
                                 boundingBoxNumbers.append(pixel_nums)
-                            # upper left point coordinate bounding box
+                            # upper left coordinate bounding box
                             x1 = int(boundingBoxNumbers[0])
                             y1 = int(boundingBoxNumbers[1])
                             # upper right coordinate of bounding box
                             x2 = int(boundingBoxNumbers[2])
                             y2 = int(boundingBoxNumbers[3])
-
+                            # get highest vertex
                             if (y1 < y2):
                                 highestVertex = y1
                             else:
@@ -99,25 +98,14 @@ def sift_read():
                             cv2.imwrite(path_save, cropped_image1)
                             # find bounding box if present
                             img_preprocessing(4, path_save)
-
-                            # Send img to Azure Read API again
-                            subscription_key = os.getenv(
-                                "AZURE_SUBSCRIPTION_KEY")
-                            endpoint = os.getenv("AZURE_ENDPOINT")
-                            computervision_client = ComputerVisionClient(
-                                endpoint, CognitiveServicesCredentials(subscription_key))
-                            read_image_path = os.path.join(
-                                UPLOAD_PATH, filename)
-                            read_image = open(read_image_path, "rb")
-
+                            # Send area of interest to Read API
                             read_response = computervision_client.read_in_stream(
                                 read_image, raw=True)
                             read_operation_location = read_response.headers["Operation-Location"]
                             operation_id = read_operation_location.split(
                                 "/")[-1]
-
-                            waitingOnAPI = True
                             # 'GET' results
+                            waitingOnAPI = True
                             while waitingOnAPI:
                                 read_result = computervision_client.get_read_result(
                                     operation_id)
