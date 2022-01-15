@@ -75,7 +75,7 @@ def sift_vision():
     return render_template('layout.html', upload=False)
 
 
-@app.route('/ocr/assess-contours', methods=["POST"])
+@app.route('/assess-contours', methods=["POST"])
 def sift_contours():
     if request.method == "POST":
         try:

@@ -15,10 +15,10 @@ This server-side application is the back-end to a mobile application providing O
 ## Project Details
 
 - Developed in Python with Flask micro-framework
+- Automated image cropping to a region of interest via text recognition
 - Image preprocessing via OpenCV
 - Utilizes Azure Computer Vision and Google Vision APIs
 - Image files via requests stored locally
-- Automated image crop to a region of interest via text recognition
 - Deployed to [Heroku](https://www.heroku.com/)
 
 ---
@@ -31,25 +31,27 @@ This server-side application is the back-end to a mobile application providing O
 
 ## API References
 
-- URL: https://computer-vision-api.herokuapp.com/sift-read
+_Note: For general use a preprocessing level of 0 for API calls will be the most effective_
+
+- URL: https://computer-vision-api.herokuapp.com/ocr/azure-read
 
   - Method: POST
   - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
   - Response: OCR Analysis via Azure Read v3.0 API
 
-- URL: https://computer-vision-api.herokuapp.com/sift-ocr
+- URL: https://computer-vision-api.herokuapp.com/ocr/azure
 
   - Method: POST
   - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
   - Response: OCR Analysis via Azure OCR v2.1 API
 
-- URL: https://computer-vision-api.herokuapp.com/sift-vision
+- URL: https://computer-vision-api.herokuapp.com/ocr/vision
 
   - Method: POST
   - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
   - Response: OCR Analysis via Google Vision API
 
-- URL: https://computer-vision-api.herokuapp.com/sift-contour
+- URL: https://computer-vision-api.herokuapp.com/ocr/sift-contour
 
   - Method: POST
   - Body: image: _the image file_
@@ -82,8 +84,8 @@ This server-side application is the back-end to a mobile application providing O
 
 ---
 
-#### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
+### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
-- ##### AZURE_SUBSCRIPTION_KEY
-- ##### AZURE_ENDPOINT
-- ##### ServiceToken.json via Google Vision
+- #### AZURE_SUBSCRIPTION_KEY
+- #### AZURE_ENDPOINT
+- #### ServiceToken.json via Google Vision

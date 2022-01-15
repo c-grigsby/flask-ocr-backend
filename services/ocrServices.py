@@ -5,7 +5,7 @@ import cv2
 import os
 import os.path
 # @scripts
-from services.api import azureAPI, googleAPI, readAPI
+from services.apiServices import azureAPI, googleAPI, readAPI
 from helpers.image_processing import img_preprocessing
 
 load_dotenv()
@@ -112,7 +112,7 @@ def azure_service(image_file, preprocessing_level):
                 height, width, _channel = img.shape
                 # crop image height to where text is found
                 cropped_image1 = img[highestVertex -
-                                     8:height, 0:width]
+                                     5:height, 0:width]
                 # save the preprocessed image
                 cv2.imwrite(path_save, cropped_image1)
                 # find bounding box if present
@@ -139,7 +139,6 @@ def azure_service(image_file, preprocessing_level):
 
 
 def vision_service(image_file, preprocessing_level):
-
     filename = image_file.filename
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
@@ -156,7 +155,7 @@ def vision_service(image_file, preprocessing_level):
     for text in texts:
         textResults.append(text.description)
     # remove lines of text
-    textResults.pop(1)
+    textResults.pop(0)
 
     if len(textResults) <= 1:
         textResults.append("No text was discovered")
