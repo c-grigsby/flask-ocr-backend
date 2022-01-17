@@ -142,6 +142,7 @@ def vision_service(image_file, preprocessing_level):
     filename = image_file.filename
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
+    boundingBoxNumbers = []
 
     img_preprocessing(preprocessing_level, path_save)
 
@@ -152,10 +153,49 @@ def vision_service(image_file, preprocessing_level):
 
     # process results
     textResults = []
-    for text in texts:
-        textResults.append(text.description)
-    # remove lines of text
-    textResults.pop(0)
+    for index, text in enumerate(texts, start=0):
+        if index != 0:
+            textResults.append(text.description)
+            textResults.pop(0)
+            if "ingredient" in text.description.lower():
+                for vertex in text.bounding_poly.vertices:
+                    boundingBoxNumbers.append(int(vertex.x))
+                    boundingBoxNumbers.append(int(vertex.y))
+                # bounding Box from where text was found
+                # upper left vertex
+                x1 = boundingBoxNumbers[0]
+                y1 = boundingBoxNumbers[1]
+                # upper right vertex
+                x2 = boundingBoxNumbers[2]
+                y2 = boundingBoxNumbers[3]
+                # bottom right vertex
+                x3 = boundingBoxNumbers[2]
+                y3 = boundingBoxNumbers[3]
+
+                # get highest vertex
+                if (y1 < y2):
+                    highestVertex = y1
+                else:
+                    highestVertex = y2
+                img = cv2.imread(path_save)
+                height, width, _channel = img.shape
+                # crop image height to where text is found
+                cropped_image = img[highestVertex - 5:height, 0:width]
+                # save the preprocessed image
+                cv2.imwrite(path_save, cropped_image)
+                # find bounding box if present
+                img_preprocessing(4, path_save)
+                # Send area of interest to Google API
+                del textResults[:]
+                response2 = googleAPI(path_save)
+                texts2 = response2.text_annotations
+                # process results
+                for index, text in enumerate(texts2):
+                    textResults.append(text.description)
+                    if index == 0:
+                        textResults.pop(0)
+
+                break
 
     if len(textResults) <= 1:
         textResults.append("No text was discovered")
