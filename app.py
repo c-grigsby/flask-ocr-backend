@@ -70,7 +70,7 @@ def sift_vision():
             return Response(response=analysis_res, status=200, mimetype="application/json")
 
         except:
-            return Response(response="An error occurred", status=500, mimetype="application/json")
+            return Response(response="An error occured", status=500, mimetype="application/json")
 
     return render_template('layout.html', upload=False)
 

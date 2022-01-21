@@ -54,6 +54,7 @@ def azure_read_service(image_file, preprocessing_level):
                                      4:height, 0:width]
                 # save the preprocessed image
                 cv2.imwrite(path_save, cropped_image1)
+
                 # find bounding box if present
                 img_preprocessing(4, path_save)
                 # Send area of interest to Read API
@@ -87,13 +88,13 @@ def azure_service(image_file, preprocessing_level):
     lines = [region["lines"] for region in regions][0]
     words = [line["words"] for line in lines]
 
-    lines_words = []
     for line_words in words:
         for lw in line_words:
             w = lw["text"]
-            lines_words.append(w)
+            textResults.append(w)
             # Search for the text "ingredient"
             if "ingredient" in lw["text"].lower():
+                textResults.clear()
                 textBoxNumbers.append(lw["boundingBox"])
                 for num in textBoxNumbers[0].split(","):
                     boundingBoxNumbers.append(int(num))
@@ -106,7 +107,7 @@ def azure_service(image_file, preprocessing_level):
                 # height
                 h = boundingBoxNumbers[3]
 
-                highestVertex = x1
+                highestVertex = y1
 
                 img = cv2.imread(path_save)
                 height, width, _channel = img.shape
@@ -116,21 +117,19 @@ def azure_service(image_file, preprocessing_level):
                 # save the preprocessed image
                 cv2.imwrite(path_save, cropped_image1)
                 # find bounding box if present
+
                 img_preprocessing(4, path_save)
+
                 # Send area of interest to Azure API
-                textResults = []
-                analysis = azureAPI(filename)
-                regions = analysis["regions"]
-                lines = [region["lines"] for region in regions][0]
-                words = [line["words"] for line in lines]
-
-                lines_words = []
-                for line_words in words:
-                    w = [lw["text"] for lw in line_words]
-                    lines_words.append(w)
-                break
-
-    textResults = lines_words
+                new_analysis = azureAPI(filename)
+                new_regions = new_analysis["regions"]
+                new_lines = [region["lines"] for region in new_regions][0]
+                new_words = [line["words"] for line in new_lines]
+                for line_items in new_words:
+                    for lw2 in line_items:
+                        word = lw2["text"]
+                        textResults.append(word)
+                return textResults
 
     if len(textResults) == 0:
         textResults.append("No text was discovered")
