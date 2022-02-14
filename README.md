@@ -79,7 +79,7 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 - Install dependencies:
 
   ```
-  $ pip install -r requirements.txt
+  $ pip3 install -r requirements.txt
   ```
 
 ---
