@@ -193,7 +193,6 @@ def vision_service(image_file, preprocessing_level):
                     textResults.append(text.description)
                     if index == 0:
                         textResults.pop(0)
-
                 break
 
     if len(textResults) <= 1:

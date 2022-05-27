@@ -87,5 +87,6 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 ### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
 - #### AZURE_SUBSCRIPTION_KEY
+- #### AZURE_SUBSCRIPTION_KEY_2
 - #### AZURE_ENDPOINT
 - #### ServiceToken.json via Google Vision
