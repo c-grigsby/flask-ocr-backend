@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import cv2
 import os
 import os.path
+import sys
 # @scripts
 from services.apiServices import azureAPI, googleAPI, readAPI
 from helpers.image_processing import img_preprocessing
@@ -16,59 +17,65 @@ UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
 
 
 def azure_read_service(image_file, preprocessing_level):
-    filename = image_file.filename
-    path_save = os.path.join(UPLOAD_PATH, filename)
-    image_file.save(path_save)
-    textBoundingBox = []
-    boundingBoxNumbers = []
     textResults = []
+    try: 
+        filename = image_file.filename
+        path_save = os.path.join(UPLOAD_PATH, filename)
+        image_file.save(path_save)
+        textBoundingBox = []
+        boundingBoxNumbers = []
 
-    img_preprocessing(preprocessing_level, path_save)
+        img_preprocessing(preprocessing_level, path_save)
 
-    read_result = readAPI(filename)
+        read_result = readAPI(filename)
 
-    for text_result in read_result.analyze_result.read_results:
-        for line in text_result.lines:
-            textResults.append(line.text)
-            # filter for text "ingredient"
-            if "ingredient" in line.text.lower():
-                textBoundingBox.append(line.bounding_box)
-                for pixel_nums in textBoundingBox[0]:
-                    boundingBoxNumbers.append(pixel_nums)
-                # upper left coordinate bounding box
-                x1 = int(boundingBoxNumbers[0])
-                y1 = int(boundingBoxNumbers[1])
-                # upper right coordinate of bounding box
-                x2 = int(boundingBoxNumbers[2])
-                y2 = int(boundingBoxNumbers[3])
-                # get highest vertex
-                if (y1 < y2):
-                    highestVertex = y1
-                else:
-                    highestVertex = y2
+        for text_result in read_result.analyze_result.read_results:
+            for line in text_result.lines:
+                textResults.append(line.text)
 
-                img = cv2.imread(path_save)
-                height, width, _channel = img.shape
-                # crop image height to where text is found
-                cropped_image1 = img[highestVertex -
+                # filter for text "ingredient"
+                if "ingredient" in line.text.lower():
+                    textBoundingBox.append(line.bounding_box)
+                    for pixel_nums in textBoundingBox[0]:
+                        boundingBoxNumbers.append(pixel_nums)
+                    # upper left coordinate bounding box
+                    x1 = int(boundingBoxNumbers[0])
+                    y1 = int(boundingBoxNumbers[1])
+                    # upper right coordinate of bounding box
+                    x2 = int(boundingBoxNumbers[2])
+                    y2 = int(boundingBoxNumbers[3])
+                    # get highest vertex
+                    if (y1 < y2):
+                        highestVertex = y1
+                    else:
+                        highestVertex = y2
+
+                    img = cv2.imread(path_save)
+                    height, width, _channel = img.shape
+                    # crop image height to where text is found
+                    cropped_image1 = img[highestVertex -
                                      4:height, 0:width]
-                # save the preprocessed image
-                cv2.imwrite(path_save, cropped_image1)
+                    # save the preprocessed image
+                    cv2.imwrite(path_save, cropped_image1)
 
-                # find bounding box if present
-                img_preprocessing(4, path_save)
-                # Send area of interest to Read API
-                textResults = []
-                read_result2 = readAPI(filename)
-                for text_result in read_result2.analyze_result.read_results:
-                    for line in text_result.lines:
-                        textResults.append(line.text)
-                break
+                    # find bounding box if present
+                    img_preprocessing(4, path_save)
+                    # Send area of interest to Read API
+                    textResults = []
+                    read_result2 = readAPI(filename)
+                    for text_result in read_result2.analyze_result.read_results:
+                        for line in text_result.lines:
+                            textResults.append(line.text)
+                    break
 
-    if len(textResults) == 0:
-        textResults.append("No text was discovered")
+        if len(textResults) == 0:
+            textResults.append("No text was discovered")
 
-    return textResults
+        return textResults
+
+    except: 
+        textResults.append("INTERNAL SERVER ERROR @ azure-read-service: ", sys.exc_info()[0])
+        return textResults
 
 
 def azure_service(image_file, preprocessing_level):
