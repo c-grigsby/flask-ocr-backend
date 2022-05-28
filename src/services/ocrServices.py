@@ -1,9 +1,11 @@
 # @packages
-from flask import Flask
+from flask import Flask, Response
 from dotenv import load_dotenv
 import cv2
+import json
 import os
 import os.path
+import sys
 # @scripts
 from services.apiServices import azureAPI, googleAPI, readAPI
 from helpers.image_processing import img_preprocessing
@@ -16,59 +18,66 @@ UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
 
 
 def azure_read_service(image_file, preprocessing_level):
-    filename = image_file.filename
-    path_save = os.path.join(UPLOAD_PATH, filename)
-    image_file.save(path_save)
-    textBoundingBox = []
-    boundingBoxNumbers = []
     textResults = []
+    try: 
+        filename = image_file.filename
+        path_save = os.path.join(UPLOAD_PATH, filename)
+        image_file.save(path_save)
+        textBoundingBox = []
+        boundingBoxNumbers = []
 
-    img_preprocessing(preprocessing_level, path_save)
+        img_preprocessing(preprocessing_level, path_save)
 
-    read_result = readAPI(filename)
+        read_result = readAPI(filename)
 
-    for text_result in read_result.analyze_result.read_results:
-        for line in text_result.lines:
-            textResults.append(line.text)
-            # filter for text "ingredient"
-            if "ingredient" in line.text.lower():
-                textBoundingBox.append(line.bounding_box)
-                for pixel_nums in textBoundingBox[0]:
-                    boundingBoxNumbers.append(pixel_nums)
-                # upper left coordinate bounding box
-                x1 = int(boundingBoxNumbers[0])
-                y1 = int(boundingBoxNumbers[1])
-                # upper right coordinate of bounding box
-                x2 = int(boundingBoxNumbers[2])
-                y2 = int(boundingBoxNumbers[3])
-                # get highest vertex
-                if (y1 < y2):
-                    highestVertex = y1
-                else:
-                    highestVertex = y2
+        for text_result in read_result.analyze_result.read_results:
+            for line in text_result.lines:
+                textResults.append(line.text)
 
-                img = cv2.imread(path_save)
-                height, width, _channel = img.shape
-                # crop image height to where text is found
-                cropped_image1 = img[highestVertex -
+                # filter for text "ingredient"
+                if "ingredient" in line.text.lower():
+                    textBoundingBox.append(line.bounding_box)
+                    for pixel_nums in textBoundingBox[0]:
+                        boundingBoxNumbers.append(pixel_nums)
+                    # upper left coordinate bounding box
+                    x1 = int(boundingBoxNumbers[0])
+                    y1 = int(boundingBoxNumbers[1])
+                    # upper right coordinate of bounding box
+                    x2 = int(boundingBoxNumbers[2])
+                    y2 = int(boundingBoxNumbers[3])
+                    # get highest vertex
+                    if (y1 < y2):
+                        highestVertex = y1
+                    else:
+                        highestVertex = y2
+
+                    img = cv2.imread(path_save)
+                    height, width, _channel = img.shape
+                    # crop image height to where text is found
+                    cropped_image1 = img[highestVertex -
                                      4:height, 0:width]
-                # save the preprocessed image
-                cv2.imwrite(path_save, cropped_image1)
+                    # save the preprocessed image
+                    cv2.imwrite(path_save, cropped_image1)
 
-                # find bounding box if present
-                img_preprocessing(4, path_save)
-                # Send area of interest to Read API
-                textResults = []
-                read_result2 = readAPI(filename)
-                for text_result in read_result2.analyze_result.read_results:
-                    for line in text_result.lines:
-                        textResults.append(line.text)
-                break
+                    # find bounding box if present
+                    img_preprocessing(4, path_save)
+                    # Send area of interest to Read API
+                    textResults = []
+                    read_result2 = readAPI(filename)
+                    for text_result in read_result2.analyze_result.read_results:
+                        for line in text_result.lines:
+                            textResults.append(line.text)
+                    break
 
-    if len(textResults) == 0:
-        textResults.append("No text was discovered")
+        if len(textResults) == 0:
+            textResults.append("No text was discovered")
 
-    return textResults
+        return textResults
+
+    except: 
+        textResults.append("Internal Server Error @ azure_read_service: ", sys.exc_info()[0])
+        analysis_res = json.dumps(textResults)
+        return Response(respose=analysis_res, status=500, mimetype="application/json")
 
 
 def azure_service(image_file, preprocessing_level):
@@ -138,65 +147,68 @@ def azure_service(image_file, preprocessing_level):
 
 
 def vision_service(image_file, preprocessing_level):
-    filename = image_file.filename
-    path_save = os.path.join(UPLOAD_PATH, filename)
-    image_file.save(path_save)
-    boundingBoxNumbers = []
-
-    img_preprocessing(preprocessing_level, path_save)
-
-    # call Google Vision API
-    response = googleAPI(path_save)
-
-    texts = response.text_annotations
-
-    # process results
     textResults = []
-    for index, text in enumerate(texts, start=0):
-        if index != 0:
-            textResults.append(text.description)
-            textResults.pop(0)
-            if "ingredient" in text.description.lower():
-                for vertex in text.bounding_poly.vertices:
-                    boundingBoxNumbers.append(int(vertex.x))
-                    boundingBoxNumbers.append(int(vertex.y))
-                # bounding Box from where text was found
-                # upper left vertex
-                x1 = boundingBoxNumbers[0]
-                y1 = boundingBoxNumbers[1]
-                # upper right vertex
-                x2 = boundingBoxNumbers[2]
-                y2 = boundingBoxNumbers[3]
-                # bottom right vertex
-                x3 = boundingBoxNumbers[2]
-                y3 = boundingBoxNumbers[3]
+    try:
+        filename = image_file.filename
+        path_save = os.path.join(UPLOAD_PATH, filename)
+        image_file.save(path_save)
+        boundingBoxNumbers = []
 
-                # get highest vertex
-                if (y1 < y2):
-                    highestVertex = y1
-                else:
-                    highestVertex = y2
-                img = cv2.imread(path_save)
-                height, width, _channel = img.shape
-                # crop image height to where text is found
-                cropped_image = img[highestVertex - 5:height, 0:width]
-                # save the preprocessed image
-                cv2.imwrite(path_save, cropped_image)
-                # find bounding box if present
-                img_preprocessing(4, path_save)
-                # Send area of interest to Google API
-                del textResults[:]
-                response2 = googleAPI(path_save)
-                texts2 = response2.text_annotations
-                # process results
-                for index, text in enumerate(texts2):
-                    textResults.append(text.description)
-                    if index == 0:
-                        textResults.pop(0)
+        img_preprocessing(preprocessing_level, path_save)
 
-                break
+        # call Google Vision API
+        response = googleAPI(path_save)
+        texts = response.text_annotations
 
-    if len(textResults) <= 1:
-        textResults.append("No text was discovered")
+        # process results
+        for index, text in enumerate(texts, start=0):
+            if index != 0:
+                textResults.append(text.description)
 
-    return textResults
+                if "ingredient" in text.description.lower():
+                    for vertex in text.bounding_poly.vertices:
+                        boundingBoxNumbers.append(int(vertex.x))
+                        boundingBoxNumbers.append(int(vertex.y))
+                    # bounding Box from where text was found
+                    # upper left vertex
+                    x1 = boundingBoxNumbers[0]
+                    y1 = boundingBoxNumbers[1]
+                    # upper right vertex
+                    x2 = boundingBoxNumbers[2]
+                    y2 = boundingBoxNumbers[3]
+                    # bottom right vertex
+                    x3 = boundingBoxNumbers[2]
+                    y3 = boundingBoxNumbers[3]
+
+                    # get highest vertex
+                    if (y1 < y2):
+                        highestVertex = y1
+                    else:
+                        highestVertex = y2
+                    img = cv2.imread(path_save)
+                    height, width, _channel = img.shape
+                    # crop image height to where text is found
+                    cropped_image = img[highestVertex - 5:height, 0:width]
+                    # save the preprocessed image
+                    cv2.imwrite(path_save, cropped_image)
+                    # find bounding box if present
+                    img_preprocessing(4, path_save)
+                    # Send area of interest to Google API
+                    del textResults[:]
+                    response2 = googleAPI(path_save)
+                    texts2 = response2.text_annotations
+                    # process results
+                    for index, text in enumerate(texts2):
+                        textResults.append(text.description)
+                        if index == 0:
+                            textResults.pop(0)
+                    break
+
+        if len(textResults) == 0:
+            textResults.append("No text was discovered")
+
+        return textResults
+    except:
+        textResults.append("Internal Server Error @ vision_service: ", sys.exc_info()[0])
+        analysis_res = json.dumps(textResults)
+        return Response(respose=analysis_res, status=500, mimetype="application/json")
