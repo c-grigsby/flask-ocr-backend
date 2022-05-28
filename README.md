@@ -62,7 +62,7 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 ## Getting Started
 
 - Ensure Python is installed locally on your machine
-- To initialize a virtual enviroment, navigate to the directory of the application in the terminal and execute:
+- To initialize a virtual enviroment, navigate to the 'src' directory of the application in the terminal and execute:
 
   ##### _Note: "python3" will depend on your version of Python_
 
@@ -87,5 +87,6 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 ### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
 - #### AZURE_SUBSCRIPTION_KEY
+- #### AZURE*SUBSCRIPTION_KEY_2 (\_for Azure OCR v2.0*)
 - #### AZURE_ENDPOINT
 - #### ServiceToken.json via Google Vision

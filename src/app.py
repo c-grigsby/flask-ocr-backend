@@ -30,10 +30,11 @@ def sift_read():
             textResults = azure_read_service(image_file, preprocessing_level)
 
             analysis_res = json.dumps(textResults)
+
             return Response(response=analysis_res, status=200, mimetype="application/json")
 
         except:
-            return Response(response="An error occurred", status=500, mimetype="application/json")
+            return Response(response="An internal server error occurred", status=500, mimetype="application/json")
 
     return render_template('layout.html', upload=False)
 
@@ -52,7 +53,7 @@ def sift_ocr():
             return Response(response=analysis_res, status=200, mimetype="application/json")
 
         except:
-            return Response(response="An error occurred", status=500, mimetype="application/json")
+            return Response(response="An internal server error occurred", status=500, mimetype="application/json")
 
     return render_template('layout.html', upload=False)
 
@@ -67,10 +68,11 @@ def sift_vision():
             textResults = vision_service(image_file, preprocessing_level)
 
             analysis_res = json.dumps(textResults)
+        
             return Response(response=analysis_res, status=200, mimetype="application/json")
 
         except:
-            return Response(response="An error occured", status=500, mimetype="application/json")
+            return Response(response="An internal server error occured", status=500, mimetype="application/json")
 
     return render_template('layout.html', upload=False)
 
