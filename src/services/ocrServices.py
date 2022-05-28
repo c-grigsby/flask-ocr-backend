@@ -16,7 +16,6 @@ app = Flask(__name__)
 BASE_PATH = os.getcwd()
 UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
 
-
 def azure_read_service(image_file, preprocessing_level):
     textResults = []
     try: 
@@ -126,7 +125,6 @@ def azure_service(image_file, preprocessing_level):
                 # save the preprocessed image
                 cv2.imwrite(path_save, cropped_image1)
                 # find bounding box if present
-
                 img_preprocessing(4, path_save)
 
                 # Send area of interest to Azure API
@@ -208,6 +206,7 @@ def vision_service(image_file, preprocessing_level):
             textResults.append("No text was discovered")
 
         return textResults
+
     except:
         textResults.append("Internal Server Error @ vision_service: ", sys.exc_info()[0])
         analysis_res = json.dumps(textResults)
