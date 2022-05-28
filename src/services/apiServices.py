@@ -13,7 +13,6 @@ import io
 BASE_PATH = os.getcwd()
 UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
 
-
 def readAPI(filename):
     # Azure 3.2 Read API Config
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY")

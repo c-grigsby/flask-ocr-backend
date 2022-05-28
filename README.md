@@ -84,7 +84,7 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 
 ---
 
-## To Run the Development Server from the Terminal
+## Run the Development Server
 
 Navigate to the 'src' directory in the terminal
 
@@ -100,9 +100,11 @@ Navigate to the 'src' directory in the terminal
   $ python -m flask run
   ```
 
+---
+
 ### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
 - #### AZURE_SUBSCRIPTION_KEY
-- #### AZURESUBSCRIPTION*KEY_2 (\_for Azure OCR v2.0*)
+- #### AZURE_SUBSCRIPTION_KEY_2 (for Azure OCR v2.0)
 - #### AZURE_ENDPOINT
 - #### ServiceToken.json via Google Vision
