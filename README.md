@@ -84,9 +84,25 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 
 ---
 
+## To Run the Development Server from the Terminal
+
+Navigate to the 'src' directory in the terminal
+
+- Activate the virtual environment:
+
+  ```
+  $ source venv/bin/activate
+  ```
+
+- Run the Development Server:
+
+  ```
+  $ python -m flask run
+  ```
+
 ### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
 - #### AZURE_SUBSCRIPTION_KEY
-- #### AZURE*SUBSCRIPTION_KEY_2 (\_for Azure OCR v2.0*)
+- #### AZURESUBSCRIPTION*KEY_2 (\_for Azure OCR v2.0*)
 - #### AZURE_ENDPOINT
 - #### ServiceToken.json via Google Vision
