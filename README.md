@@ -24,7 +24,7 @@ This server-side application is the back-end to a mobile application providing O
 
 ---
 
-This server-side application has been developed to enable custom data extraction. Here it can scan an uploaded image for a keyword or arrangement of characters, and if found, the application will auto-crop the uploaded image to the region of interest and return OCR analysis focused to this area.
+This server-side application has been developed to enable custom data extraction. With this feature it will search an uploaded image for any keyword or arrangement of characters, and if found, the application will auto-crop the image file to the region of interest and return an OCR analysis filtered to this area.
 
 ---
 
