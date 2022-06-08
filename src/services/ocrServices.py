@@ -17,7 +17,7 @@ app = Flask(__name__)
 BASE_PATH = os.getcwd()
 UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
 
-def azure_read_service(image_file, preprocessing_level):
+def azure_read_service(image_file, preprocessing_level, search_text):
     textResults = []
     try: 
         filename = image_file.filename
@@ -34,8 +34,8 @@ def azure_read_service(image_file, preprocessing_level):
             for line in text_result.lines:
                 textResults.append(line.text)
 
-                # filter for text "ingredient"
-                if "ingredient" in line.text.lower():
+                # filter for text, if found crop image and response to region of interest
+                if search_text != "" and search_text in line.text.lower():
                     textBoundingBox.append(line.bounding_box)
                     for pixel_nums in textBoundingBox[0]:
                         boundingBoxNumbers.append(pixel_nums)
@@ -61,7 +61,7 @@ def azure_read_service(image_file, preprocessing_level):
 
                     # find bounding box if present
                     img_preprocessing(4, path_save)
-                    # Send area of interest to Read API
+                    # Send region of interest to Read API 
                     textResults = []
                     read_result2 = readAPI(filename)
                     for text_result in read_result2.analyze_result.read_results:
