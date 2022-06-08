@@ -22,13 +22,16 @@ def home():
 
 
 @app.route('/ocr/azure-read', methods=["POST", "GET"])
-def sift_read():
+def azure_read():
     if request.method == "POST":
         try:
             image_file = request.files['image']
             preprocessing_level = int(request.form['preprocessing'])
+            search_text = request.form['search']
 
-            textResults = azure_read_service(image_file, preprocessing_level)
+            print("Search Text: ", search_text)
+
+            textResults = azure_read_service(image_file, preprocessing_level, search_text)
 
             analysis_res = json.dumps(textResults)
 
@@ -41,13 +44,14 @@ def sift_read():
 
 
 @app.route('/ocr/azure', methods=["POST", "GET"])
-def sift_ocr():
+def azure():
     if request.method == "POST":
         try:
             image_file = request.files['image']
             preprocessing_level = int(request.form['preprocessing'])
+            search_text = request.form['search']
 
-            textResults = azure_service(image_file, preprocessing_level)
+            textResults = azure_service(image_file, preprocessing_level, search_text)
 
             analysis_res = json.dumps(textResults)
 
@@ -60,13 +64,14 @@ def sift_ocr():
 
 
 @app.route('/ocr/vision', methods=["POST", "GET"])
-def sift_vision():
+def vision():
     if request.method == "POST":
         try:
             image_file = request.files['image']
             preprocessing_level = int(request.form['preprocessing'])
+            search_text = request.form['search']
 
-            textResults = vision_service(image_file, preprocessing_level)
+            textResults = vision_service(image_file, preprocessing_level, search_text)
 
             analysis_res = json.dumps(textResults)
         

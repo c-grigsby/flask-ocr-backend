@@ -6,15 +6,65 @@
 
 # Flask OCR Back-end
 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/p?style=plastic)
+![PyPI - License](https://img.shields.io/pypi/l/flask?style=plastic)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c-grigsby/flask-ocr-backend?style=plastic)
+![GitHub repo size](https://img.shields.io/github/repo-size/c-grigsby/flask-ocr-backend?style=plastic)
+![Lines of code](https://img.shields.io/tokei/lines/github/c-grigsby/flask-ocr-backend?style=plastic)
+
 </div>
 
-This server-side application is the back-end to a mobile application providing Optical Character Recognition (OCR) image processing. This machine learning technology enables the application to read the text found within an uploaded image and returns a JSON response with the text results from OCR analysis. 
+This server-side application is the back-end to a mobile application providing Optical Character Recognition (OCR) image processing. This machine learning technology enables the application to read the text found within an image uploaded to the API and returns a JSON response with the text discovered via OCR analysis.
+
+<div align="center">
+
+<img src="https://i.stack.imgur.com/7UvTj.png" height="150px"/>
+
+</div>
+
+---
+
+This server-side application has been developed to enable custom data extraction. With this feature it will search an uploaded image for any keyword or arrangement of characters, and if found, the application will auto-crop the image file to the region of interest and return an OCR analysis filtered to this area.
+
+---
+
+Example: Image uploaded to the API with keyword "ingredients"
+
+|                                      Before                                      |                                     After                                      |
+| :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
+| <img src="./src/static/test_before.png" height="250px" alt="Test Image Before"/> | <img src="./src/static/test_after.png" height="150px" alt="Test Image After"/> |
+
+---
+
+Example: JSON response from API
+
+[
+"INGREDIENTS : WHITE MISO POWDER (SOYBEANS, RICE, SALT),",
+"DEHYDRATED SEAWEED, DEHYDRATED WHEAT GLUTEN,",
+"MODIFIED FOOD STARCH, BONITO POWDER (FISH), MONOSODIUM",
+"GLUTAMATE, DEHYDRATED GREEN ONION, HYDROLYZED",
+"PROTEIN (CORN, WHEAT, SOYBEANS), YEAST EXTRACT,",
+"POTASSIUM CHLORIDE, DISODIUM INOSINATE, DISODIUM",
+"GUANYLATE, SALT, DEHYDRATED SOY SAUCE, DL-METHIONINE,",
+"DIPOTASSIUM PHOSPHATE, CALCIUM LACTATE, FLAVORINGS.",
+"0 41390 03063 5",
+"Questions? In the USA, contact KIKKOMAN SALES USA, INC. San Francisco, CA 94111",
+"PRODUCT OF JAPAN",
+"Kikkoman Corporation",
+"日本製",
+"DISTRIBUTED BY",
+"販売者 キッコーマン株式会社",
+"TOKYO 105-8428 JAPAN",
+"kikkoman",
+"KIKKOMAN & a mastered trademark of Kikkoman Corporation",
+"東京 105-8428 日本国"
+]
 
 ---
 
 ## Project Details
 
-- Developed with Python and Flask micro-framework
+- Developed with Python version 3.9 and Flask micro-framework
 - Automated image cropping to a region of interest via text recognition
 - Image preprocessing via OpenCV
 - Utilizes Azure Computer Vision and Google Vision APIs
@@ -31,25 +81,46 @@ This server-side application is the back-end to a mobile application providing O
 
 ## API References
 
-_Note: For general use a preprocessing level of 0 for API calls will be the most effective_
+For general use a preprocessing level of 0 for API calls will be the most effective
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/azure-read
 
   - Method: POST
-  - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
+  - Body:
+    - image: {_the image file_}
+    - preprocessing: {_a number from 0 - 4_}
+    - search: {_the character arrangement to search for, will crop the uploaded image and provide a response from the region of interest_}
+    - ##### _The search parameter is required, but can be left empty_
   - Response: OCR Analysis via Azure Read v3.0 API
+  - Average Result: ⭐ ⭐ ⭐ ⭐
+
+---
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/azure
 
   - Method: POST
-  - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
+  - Body:
+    - image: {_the image file_}
+    - preprocessing: {_a number from 0 - 4_}
+    - search: {_the character arrangement to search for, will crop the uploaded image and provide a response from the region of interest_}
+    - ##### _The search parameter is required, but can be left empty_
   - Response: OCR Analysis via Azure OCR v2.1 API
+  - Average Result: ⭐ ⭐
+
+---
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/vision
 
   - Method: POST
-  - Body: image: _the image file_, preprocessing: _a number from 0 - 4_
+  - Body:
+    - image: {_the image file_}
+    - preprocessing: {_a number from 0 - 4_}
+    - search: {_the character arrangement to search for, will crop the uploaded image and provide a response from the region of interest_}
+    - ##### _The search parameter is required, but can be left empty_
   - Response: OCR Analysis via Google Vision API
+  - Average Result: ⭐ ⭐ ⭐ ⭐
+
+---
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/sift-contour
 
@@ -62,7 +133,7 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 ## Getting Started
 
 - Ensure Python is installed locally on your machine
-- To initialize a virtual enviroment, navigate to the 'src' directory of the application in the terminal and execute:
+- To initialize a virtual enviroment, navigate to the directory of the application in the terminal and execute:
 
   ##### _Note: "python3" will depend on your version of Python_
 
@@ -86,25 +157,27 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
 
 ## Run the Development Server
 
-Navigate to the 'src' directory in the terminal
-
-- Activate the virtual environment:
+- Navigate to the project in the terminal and activate the virtual environment:
 
   ```
   $ source venv/bin/activate
   ```
 
-- Run the Development Server:
+- Run the development server from the 'src' directory:
 
   ```
-  $ python -m flask run
+  $ flask run
   ```
 
 ---
 
 ### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
 
-- #### AZURE_SUBSCRIPTION_KEY
+- #### AZURE_SUBSCRIPTION_KEY (for Azure Read)
 - #### AZURE_SUBSCRIPTION_KEY_2 (for Azure OCR v2.0)
 - #### AZURE_ENDPOINT
-- #### ServiceToken.json via Google Vision
+- #### FLASK_ENV=development (or FLASK_ENV=production)
+
+### In addition, this application utilizes a ServiceToken.json provided via Google Vision
+
+---
