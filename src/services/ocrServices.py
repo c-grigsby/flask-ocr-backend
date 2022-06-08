@@ -34,7 +34,7 @@ def azure_read_service(image_file, preprocessing_level, search_text):
             for line in text_result.lines:
                 textResults.append(line.text)
 
-                # filter for text, if found crop image and response to region of interest
+                # search for keyword, if found crop image and filter OCR response to region of interest
                 if search_text != "" and search_text in line.text.lower():
                     textBoundingBox.append(line.bounding_box)
                     for pixel_nums in textBoundingBox[0]:
@@ -80,7 +80,7 @@ def azure_read_service(image_file, preprocessing_level, search_text):
         return Response(respose=analysis_res, status=500, mimetype="application/json")
 
 
-def azure_service(image_file, preprocessing_level):
+def azure_service(image_file, preprocessing_level, search_text):
     filename = image_file.filename
     path_save = os.path.join(UPLOAD_PATH, filename)
     image_file.save(path_save)
@@ -101,8 +101,9 @@ def azure_service(image_file, preprocessing_level):
         for lw in line_words:
             w = lw["text"]
             textResults.append(w)
-            # Search for the text "ingredient"
-            if "ingredient" in lw["text"].lower():
+            
+             # search for keyword, if found crop image and filter OCR response to region of interest
+            if search_text != "" and search_text in lw["text"].lower():
                 textResults.clear()
                 textBoxNumbers.append(lw["boundingBox"])
                 for num in textBoxNumbers[0].split(","):

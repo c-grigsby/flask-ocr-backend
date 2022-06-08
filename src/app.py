@@ -49,8 +49,9 @@ def azure():
         try:
             image_file = request.files['image']
             preprocessing_level = int(request.form['preprocessing'])
+            search_text = request.form['search']
 
-            textResults = azure_service(image_file, preprocessing_level)
+            textResults = azure_service(image_file, preprocessing_level, search_text)
 
             analysis_res = json.dumps(textResults)
 

@@ -30,9 +30,9 @@ This server-side application has been developed to enable custom data extraction
 
 Example: Image uploaded to the API with keyword "ingredients"
 
-|                                         Before                                          |                                         After                                         |
-| :-------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------: |
-| <img src="./src/static/upload/test_before.png" height="250px" alt="Test Image Before"/> | <img src="./src/static/upload/test_after.png" height="150px" alt="Test Image After"/> |
+|                                      Before                                      |                                     After                                      |
+| :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
+| <img src="./src/static/test_before.png" height="250px" alt="Test Image Before"/> | <img src="./src/static/test_after.png" height="150px" alt="Test Image After"/> |
 
 ---
 
@@ -81,7 +81,7 @@ Example: JSON response from API
 
 ## API References
 
-_Note: For general use a preprocessing level of 0 for API calls will be the most effective_
+For general use a preprocessing level of 0 for API calls will be the most effective
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/azure-read
 
@@ -92,6 +92,9 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
     - search: {_the character arrangement to search for, will crop the uploaded image and provide a response from the region of interest_}
     - ##### _The search parameter is required, but can be left empty_
   - Response: OCR Analysis via Azure Read v3.0 API
+  - Average Result: ⭐ ⭐ ⭐ ⭐
+
+---
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/azure
 
@@ -102,6 +105,9 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
     - search: {_the character arrangement to search for, will crop the uploaded image and provide a response from the region of interest_}
     - ##### _The search parameter is required, but can be left empty_
   - Response: OCR Analysis via Azure OCR v2.1 API
+  - Average Result: ⭐ ⭐
+
+---
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/vision
 
@@ -112,6 +118,9 @@ _Note: For general use a preprocessing level of 0 for API calls will be the most
     - search: {_the character arrangement to search for, will crop the uploaded image and provide a response from the region of interest_}
     - ##### _The search parameter is required, but can be left empty_
   - Response: OCR Analysis via Google Vision API
+  - Average Result: ⭐ ⭐ ⭐ ⭐
+
+---
 
 - URL: https://computer-vision-api.herokuapp.com/ocr/sift-contour
 
