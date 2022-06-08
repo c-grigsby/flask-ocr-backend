@@ -10,6 +10,7 @@ import requests
 import os
 import io
 
+
 BASE_PATH = os.getcwd()
 UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
 
