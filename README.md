@@ -8,17 +8,17 @@
 
 </div>
 
-This server-side application is the back-end to a mobile application providing Optical Character Recognition (OCR) for image processing. This machine learning technology enables the API to read the text found within an uploaded image, and returns a response with the text results from the OCR analysis. 
+This server-side application is the back-end to a mobile application providing Optical Character Recognition (OCR) image processing. This machine learning technology enables the application to read the text found within an uploaded image, and then returns a JSON response with the text results from the OCR analysis. 
 
 ---
 
 ## Project Details
 
-- Developed in Python with Flask micro-framework
+- Developed with Python and Flask micro-framework
 - Automated image cropping to a region of interest via text recognition
 - Image preprocessing via OpenCV
 - Utilizes Azure Computer Vision and Google Vision APIs
-- Image files via requests stored locally
+- Image files via requests are stored locally to the application
 - Deployed to [Heroku](https://www.heroku.com/)
 
 ---
