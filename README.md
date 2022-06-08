@@ -8,7 +8,7 @@
 
 </div>
 
-This server-side application is the back-end to a mobile application providing Optical Character Recognition (OCR) image processing. This machine learning technology enables the application to read the text found within an uploaded image, and then returns a JSON response with the text results from the OCR analysis. 
+This server-side application is the back-end to a mobile application providing Optical Character Recognition (OCR) image processing. This machine learning technology enables the application to read the text found within an uploaded image and returns a JSON response with the text results from OCR analysis. 
 
 ---
 

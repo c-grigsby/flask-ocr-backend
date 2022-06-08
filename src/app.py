@@ -8,6 +8,7 @@ import os.path
 from helpers.image_processing import assess_contours, img_preprocessing
 from services.ocrServices import azure_read_service, azure_service, vision_service
 
+
 load_dotenv()
 app = Flask(__name__)
 
