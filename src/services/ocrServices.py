@@ -10,6 +10,7 @@ import sys
 from services.apiServices import azureAPI, googleAPI, readAPI
 from helpers.image_processing import img_preprocessing
 
+
 load_dotenv()
 app = Flask(__name__)
 
