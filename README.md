@@ -30,9 +30,9 @@ This server-side application has been developed to enable custom data extraction
 
 Example: Image uploaded to the API with keyword "ingredients"
 
-|                                      Before                                      |                                     After                                      |
-| :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
-| <img src="./src/static/test_before.png" height="250px" alt="Test Image Before"/> | <img src="./src/static/test_after.png" height="150px" alt="Test Image After"/> |
+|                                       Before                                       |                                      After                                       |
+| :--------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
+| <img src="./src/static/readme_before.png" height="250px" alt="Test Image Before"/> | <img src="./src/static/readme_after.png" height="150px" alt="Test Image After"/> |
 
 ---
 
