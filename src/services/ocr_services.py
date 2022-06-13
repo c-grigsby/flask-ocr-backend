@@ -1,22 +1,18 @@
 # @packages
-from flask import Flask, Response
-from dotenv import load_dotenv
+from flask import Response
 import cv2
 import json
 import os
 import os.path
 import sys
 # @scripts
-from services.apiServices import azureAPI, googleAPI, readAPI
+from services.api_services import azureAPI, googleAPI, readAPI
 from helpers.image_processing import img_preprocessing
 
 
-load_dotenv()
-app = Flask(__name__)
-
 BASE_PATH = os.getcwd()
 UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload')
-
+ 
 def azure_read_service(image_file, preprocessing_level, search_text):
     textResults = []
     try: 
@@ -45,7 +41,7 @@ def azure_read_service(image_file, preprocessing_level, search_text):
                     # upper right coordinate of bounding box
                     x2 = int(boundingBoxNumbers[2])
                     y2 = int(boundingBoxNumbers[3])
-                    # get highest vertex
+                    # get highest vertex (lower numbers higher up on the image)
                     if (y1 < y2):
                         highestVertex = y1
                     else:
