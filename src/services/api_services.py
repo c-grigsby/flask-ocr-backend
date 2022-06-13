@@ -22,7 +22,6 @@ def readAPI(filename):
         endpoint, CognitiveServicesCredentials(subscription_key))
     read_image_path = os.path.join(UPLOAD_PATH, filename)
     read_image = open(read_image_path, "rb")
-
     # Call API with img and raw response to get OperationID
     read_response = computervision_client.read_in_stream(
         read_image, raw=True)
@@ -39,7 +38,7 @@ def readAPI(filename):
         if read_result.status.lower() not in ['notstarted', 'running']:
             waitingOnAPI = False
             break
-        time.sleep(.5)
+        time.sleep(.25)
 
     if read_result.status == OperationStatusCodes.succeeded:
 
@@ -47,7 +46,7 @@ def readAPI(filename):
 
 
 def azureAPI(filename):
-    # send image to Azure OCR API
+    # send image to Azure v2.0 OCR API
     subscription_key = os.getenv("AZURE_SUBSCRIPTION_KEY_2")
     vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
     ocr_url = vision_base_url + "ocr"
