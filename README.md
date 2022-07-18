@@ -172,13 +172,13 @@ For general use a preprocessing level of 0 for API calls will be the most effect
 
 ---
 
-### This application utilizes a .env file to host environment variables. For utilization configure the following keys:
+### This application utilizes a .env file to host environment variables. For local utilization configure the following keys:
 
 - #### AZURE_SUBSCRIPTION_KEY (for Azure Read)
 - #### AZURE_SUBSCRIPTION_KEY_2 (for Azure OCR v2.0)
 - #### AZURE_ENDPOINT
 - #### FLASK_ENV=development (or FLASK_ENV=production)
 
-### In addition, this application utilizes a ServiceToken.json provided via Google Vision
+#### In addition, this application utilizes a ServiceToken.json provided via Google Vision
 
 ---
