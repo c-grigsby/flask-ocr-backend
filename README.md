@@ -24,7 +24,7 @@ This server-side application is the back-end to a mobile application providing O
 
 ---
 
-This server-side application has been developed to enable custom data extraction. With this feature it will search an uploaded image for any keyword or arrangement of characters, and if found, the application will auto-crop the image file to the region of interest and return an OCR analysis filtered to this area.
+This application has been developed to enable custom data extraction. With this feature it will search an uploaded image for any keyword or arrangement of characters, and if found, the application will auto-crop the image file to the region of interest and return an OCR analysis filtered to this area.
 
 ---
 
@@ -36,8 +36,9 @@ Example: Image uploaded to the API with keyword "ingredients"
 
 ---
 
-Example: JSON response from API
+Example: JSON response from image uploaded to the API with keyword "ingredients"
 
+```
 [
 "INGREDIENTS : WHITE MISO POWDER (SOYBEANS, RICE, SALT),",
 "DEHYDRATED SEAWEED, DEHYDRATED WHEAT GLUTEN,",
@@ -59,7 +60,7 @@ Example: JSON response from API
 "KIKKOMAN & a mastered trademark of Kikkoman Corporation",
 "東京 105-8428 日本国"
 ]
-
+```
 ---
 
 ## Project Details
